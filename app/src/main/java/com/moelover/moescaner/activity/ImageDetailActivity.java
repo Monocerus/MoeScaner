@@ -89,7 +89,7 @@ public class ImageDetailActivity extends AppCompatActivity{
 
         @Override
         public Fragment getItem(int position) {
-            return ImageDetailFragment.newInstance(imageViewArray.getImages().get(position).getSample_url(),
+            return ImageDetailFragment.newInstance(imageViewArray.getImages().get(position).getPreview_url(),
                     imageViewArray.getImages().get(position).getFile_url());
         }
     }
