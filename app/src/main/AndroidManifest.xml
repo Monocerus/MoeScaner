@@ -24,12 +24,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.AboutApp" />
-        <activity android:name=".activity.ImageGalleryActivity"
-            android:launchMode="singleTask">
-        </activity>
         <activity android:name=".activity.ImageDetailActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/FullScreen">
+                  android:launchMode="singleTask"
+                  android:theme="@style/FullScreen">
 
         </activity>
     </application>

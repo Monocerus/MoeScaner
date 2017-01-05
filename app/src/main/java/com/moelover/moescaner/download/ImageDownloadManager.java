@@ -36,11 +36,19 @@ public class ImageDownloadManager {
     public void download(String url) {
         Uri uri = Uri.parse(url);
         DownloadManager.Request request = new DownloadManager.Request(uri);
+        String strFileName = uri.getLastPathSegment();
         request.allowScanningByMediaScanner();
         request.setVisibleInDownloadsUi(false);
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
-        File file = new File(Environment.getExternalStorageDirectory() + File.separator + "MoeLover", uri.getLastPathSegment());
+        try {
+            String strDecoderUrl = URLDecoder.decode(url,"UTF-8");
+            String[] result = strDecoderUrl.split(" ");
+            strFileName = result[0] +" "+ result[1];
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        File file = new File(Environment.getExternalStorageDirectory() + File.separator + "MoeLover", strFileName);
         if (!file.exists()) {
             request.setDestinationUri(Uri.fromFile(file));
             downloadManager.enqueue(request);
@@ -48,11 +56,5 @@ public class ImageDownloadManager {
             Toast.makeText(ApplicationController.getInstance(), "文件已存在", Toast.LENGTH_SHORT).show();
         }
 
-    }
-
-    public void download(String[] urls) {
-        for (String url : urls) {
-
-        }
     }
 }
