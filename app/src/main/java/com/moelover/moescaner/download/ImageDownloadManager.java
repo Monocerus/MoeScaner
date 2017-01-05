@@ -43,8 +43,11 @@ public class ImageDownloadManager {
         //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
         try {
             String strDecoderUrl = URLDecoder.decode(url,"UTF-8");
-            String[] result = strDecoderUrl.split(" ");
-            strFileName = result[0] +" "+ result[1];
+            Uri uri1 = Uri.parse(strDecoderUrl);
+            strFileName = uri1.getLastPathSegment();
+            String[] result = strFileName.split(" ");
+            int length = result[result.length-1].length();
+            strFileName = result[0] +" "+ result[1]+ result[result.length-1].substring(length-4,length);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
