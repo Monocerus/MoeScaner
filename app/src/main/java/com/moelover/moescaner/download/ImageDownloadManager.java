@@ -35,11 +35,12 @@ public class ImageDownloadManager {
 
     public void download(String url) {
         Uri uri = Uri.parse(url);
+        Log.d("tianlele",url);
         DownloadManager.Request request = new DownloadManager.Request(uri);
         String strFileName = uri.getLastPathSegment();
         request.allowScanningByMediaScanner();
         request.setVisibleInDownloadsUi(false);
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
         //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
         try {
             String strDecoderUrl = URLDecoder.decode(url,"UTF-8");
@@ -48,10 +49,11 @@ public class ImageDownloadManager {
             String[] result = strFileName.split(" ");
             int length = result[result.length-1].length();
             strFileName = result[0] +" "+ result[1]+ result[result.length-1].substring(length-4,length);
+            Log.d("tianlele",strFileName);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        File file = new File(Environment.getExternalStorageDirectory() + File.separator + "MoeLover", strFileName);
+        File file = new File(Environment.getExternalStorageDirectory() + File.separator + "yande.re", strFileName);
         if (!file.exists()) {
             request.setDestinationUri(Uri.fromFile(file));
             downloadManager.enqueue(request);

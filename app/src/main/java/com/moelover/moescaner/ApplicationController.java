@@ -132,6 +132,8 @@ public class ApplicationController extends Application{
         }
     }
 
+
+
     public DisplayImageOptions getOptions() {
         return options;
     }

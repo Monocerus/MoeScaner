@@ -1,6 +1,8 @@
 package com.moelover.moescaner;
 
+import android.app.DownloadManager;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -15,17 +17,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.moelover.moescaner.activity.AboutApp;
+import com.moelover.moescaner.broadcast.DownloadManagerReceiver;
 import com.moelover.moescaner.fragment.RecycleImageFragment;
+import com.moelover.moescaner.services.AutoDownloadService;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     int lastNavItemId = -1 ; //记录上次打开的fragmenttag
+    DownloadManagerReceiver downloadManagerReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        downloadManagerReceiver = new DownloadManagerReceiver();
+        IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        registerReceiver(downloadManagerReceiver,intentFilter);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -115,6 +123,8 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_download) {
+            Intent intent = new Intent(this, AutoDownloadService.class);
+            startService(intent);
             return true;
         }
 
@@ -135,5 +145,11 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(downloadManagerReceiver);
     }
 }
