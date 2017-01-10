@@ -139,6 +139,7 @@ public class MainActivity extends AppCompatActivity
         if(id == R.id.nav_send){
             Intent intent = new Intent(this, AboutApp.class);
             startActivity(intent);
+
         }else{
             showNavigationFragement(id);
         }

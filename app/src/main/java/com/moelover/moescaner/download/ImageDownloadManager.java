@@ -35,11 +35,11 @@ public class ImageDownloadManager {
 
     public void download(String url) {
         Uri uri = Uri.parse(url);
-        Log.d("tianlele",url);
+        //Log.d("tianlele",url);
         DownloadManager.Request request = new DownloadManager.Request(uri);
         String strFileName = uri.getLastPathSegment();
         request.allowScanningByMediaScanner();
-        request.setVisibleInDownloadsUi(false);
+        request.setVisibleInDownloadsUi(true); //是否显示在下载管理器中
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
         //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
         try {
@@ -61,5 +61,26 @@ public class ImageDownloadManager {
             Toast.makeText(ApplicationController.getInstance(), "文件已存在", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    public boolean hasFiles(String url) {
+        Uri uri = Uri.parse(url);
+        //Log.d("tianlele",url);
+        String strFileName = uri.getLastPathSegment();
+
+        //request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+        try {
+            String strDecoderUrl = URLDecoder.decode(url,"UTF-8");
+            Uri uri1 = Uri.parse(strDecoderUrl);
+            strFileName = uri1.getLastPathSegment();
+            String[] result = strFileName.split(" ");
+            int length = result[result.length-1].length();
+            strFileName = result[0] +" "+ result[1]+ result[result.length-1].substring(length-4,length);
+            //Log.d("tianlele",strFileName);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        File file = new File(Environment.getExternalStorageDirectory() + File.separator + "yande.re", strFileName);
+        return file.exists();
     }
 }
