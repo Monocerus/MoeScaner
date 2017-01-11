@@ -19,11 +19,13 @@ import com.moelover.moescaner.model.ImageViewArray;
 import com.moelover.moescaner.net.GsonRequest;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 public class AutoDownloadService extends Service {
 
-    LinkedList<String> downloadurl;
+    ImageViewArray imageViewArray;
     int pageNumber = 0;
     boolean loadding = false;
     private String strUri = "https://yande.re/post.json?";
@@ -38,7 +40,7 @@ public class AutoDownloadService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        downloadurl = new LinkedList<>();
+        imageViewArray = new ImageViewArray();
         PowerManager pm  = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, AutoDownloadService.class.getName());
         wakeLock.acquire();
@@ -49,16 +51,13 @@ public class AutoDownloadService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if(downloadurl.size() <= 0) {
-                    while(downloadurl.size() <= 0) {
-                        if(!loadding) {
-                            loadmorePicture();
-                        }
+                while (imageViewArray.getImages().size() <= 0 || loadding) {
+                    if (!loadding) {
+                        loadmorePicture();
                     }
                 }
-                //Log.d("tianlele","当前下载图片"+downloadurl.getFirst());
-                ImageDownloadManager.getInstance().download(downloadurl.getFirst());
-                downloadurl.removeFirst();
+                ImageDownloadManager.getInstance().download(imageViewArray.getImages().get(0).getFile_url(),imageViewArray.getImages().get(0).getFileName());
+                imageViewArray.getImages().remove(0);
             }
         }).start();
         return super.onStartCommand(intent, flags, startId);
@@ -73,9 +72,9 @@ public class AutoDownloadService extends Service {
                     @Override
                     public void onResponse(ArrayList<ImageModelYande> response) {
                         //添加为下载的图片
-                        for(ImageModelYande imageModelYande : response) {
-                            if(!ImageDownloadManager.getInstance().hasFiles(imageModelYande.getFile_url())) {
-                                downloadurl.add(imageModelYande.getFile_url());
+                        for(int i = 0 ;i<response.size();i++) {
+                            if(!ImageDownloadManager.getInstance().hasFiles(response.get(i).getFileName())) {
+                                imageViewArray.getImages().add(response.get(i));
                             }
                         }
                         loadding = false;
@@ -83,8 +82,9 @@ public class AutoDownloadService extends Service {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                Log.d("tianlele","第"+pageNumber+"页加载失败。");
                 pageNumber--;
-                Toast.makeText(AutoDownloadService.this, "加载失败", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(AutoDownloadService.this, "加载失败", Toast.LENGTH_SHORT).show();
             }
         });
         ApplicationController.getInstance().addToRequestQueue(request);

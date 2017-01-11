@@ -36,8 +36,10 @@ import uk.co.senab.photoview.PhotoView;
 public class ImageDetailFragment extends Fragment {
     private static final String IMAGE_DATA_EXTRA = "extra_image_data";
     private static final String FILE_DATA_EXTRA = "extra_file_data";
+    private static final String FILE_NAME_EXTRA = "extra_file_name";
     private String mImageUrl;
     private String mFileUrl;
+    private String mFileName;
     private PhotoView mImageView;
     private ProgressBar mProgressBar;
     private Button mBtnDownload;
@@ -48,12 +50,13 @@ public class ImageDetailFragment extends Fragment {
      * @param imageUrl The image url to load
      * @return A new instance of ImageDetailFragment with imageNum extras
      */
-    public static ImageDetailFragment newInstance(String imageUrl, String fileUrl) {
+    public static ImageDetailFragment newInstance(String imageUrl, String fileUrl , String fileName) {
         final ImageDetailFragment f = new ImageDetailFragment();
 
         final Bundle args = new Bundle();
         args.putString(IMAGE_DATA_EXTRA, imageUrl);
         args.putString(FILE_DATA_EXTRA, fileUrl);
+        args.putString(FILE_NAME_EXTRA,fileName);
         f.setArguments(args);
 
         return f;
@@ -66,13 +69,14 @@ public class ImageDetailFragment extends Fragment {
 
     /**
      * Populate image using a url from extras, use the convenience factory method
-     * {@link ImageDetailFragment#newInstance(String,String)} to create this fragment.
+     * {@link ImageDetailFragment#newInstance(String,String,String)} to create this fragment.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mImageUrl = getArguments() != null ? getArguments().getString(IMAGE_DATA_EXTRA) : null;
         mFileUrl = getArguments() != null ? getArguments().getString(FILE_DATA_EXTRA) : null;
+        mFileName = getArguments() != null ? getArguments().getString(FILE_NAME_EXTRA) : null;
     }
 
     @Override
@@ -87,7 +91,7 @@ public class ImageDetailFragment extends Fragment {
         mBtnDownload.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                ImageDownloadManager.getInstance().download(mFileUrl);
+                ImageDownloadManager.getInstance().download(mFileUrl,mFileName);
             }
         });
         return v;

@@ -440,4 +440,8 @@ public class ImageModelYande implements Serializable {
     public void setLast_commented_at(int last_commented_at) {
         this.last_commented_at = last_commented_at;
     }
+
+    public String getFileName() {
+        return "yande.re "+getId()+"."+file_ext;
+    }
 }
