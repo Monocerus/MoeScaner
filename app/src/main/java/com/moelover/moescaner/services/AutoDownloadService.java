@@ -13,6 +13,8 @@ import com.android.volley.VolleyError;
 import com.google.gson.reflect.TypeToken;
 import com.moelover.moescaner.ApplicationController;
 import com.moelover.moescaner.broadcast.DownloadManagerReceiver;
+import com.moelover.moescaner.database.DownloadDBOperation;
+import com.moelover.moescaner.database.ImageDownloadOpenHelper;
 import com.moelover.moescaner.download.ImageDownloadManager;
 import com.moelover.moescaner.model.ImageModelYande;
 import com.moelover.moescaner.model.ImageViewArray;
@@ -31,6 +33,8 @@ public class AutoDownloadService extends Service {
     private String strUri = "https://yande.re/post.json?";
     private String strPage = "page=";
     PowerManager.WakeLock wakeLock;
+    ImageDownloadOpenHelper imageDownloadOpenHelper;
+    DownloadDBOperation dbOperation;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -41,6 +45,7 @@ public class AutoDownloadService extends Service {
     public void onCreate() {
         super.onCreate();
         imageViewArray = new ImageViewArray();
+        dbOperation = new DownloadDBOperation(this);
         PowerManager pm  = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, AutoDownloadService.class.getName());
         wakeLock.acquire();
@@ -57,6 +62,7 @@ public class AutoDownloadService extends Service {
                     }
                 }
                 ImageDownloadManager.getInstance().download(imageViewArray.getImages().get(0).getFile_url(),imageViewArray.getImages().get(0).getFileName());
+                dbOperation.insert(imageViewArray.getImages().get(0));
                 imageViewArray.getImages().remove(0);
             }
         }).start();
@@ -73,8 +79,14 @@ public class AutoDownloadService extends Service {
                     public void onResponse(ArrayList<ImageModelYande> response) {
                         //添加为下载的图片
                         for(int i = 0 ;i<response.size();i++) {
-                            if(!ImageDownloadManager.getInstance().hasFiles(response.get(i).getFileName())) {
-                                imageViewArray.getImages().add(response.get(i));
+                            if(ImageDownloadManager.getInstance().hasFiles(response.get(i).getFileName())) {  //本地已经有了
+                                if(!dbOperation.hasDownload(response.get(i).getId())) { //数据库没有
+                                    dbOperation.insert(response.get(i));
+                                }
+                            } else {  //本地没有
+                                if(!dbOperation.hasDownload(response.get(i).getId())) {
+                                    imageViewArray.getImages().add(response.get(i));
+                                }
                             }
                         }
                         loadding = false;

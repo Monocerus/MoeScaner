@@ -18,6 +18,7 @@ import android.view.MenuItem;
 
 import com.moelover.moescaner.activity.AboutApp;
 import com.moelover.moescaner.broadcast.DownloadManagerReceiver;
+import com.moelover.moescaner.database.ImageDownloadOpenHelper;
 import com.moelover.moescaner.fragment.RecycleImageFragment;
 import com.moelover.moescaner.services.AutoDownloadService;
 
